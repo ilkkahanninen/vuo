@@ -1,0 +1,102 @@
+/*jslint node: true*/
+
+"use strict";
+
+var
+  State = require('./State'),
+  xtype = require('xtypejs'),
+  Dispatcher = require('./Dispatcher'),
+  EventEmitter = require('events').EventEmitter,
+  assign = require('object-assign'),
+  clone = require('clone');
+
+/**
+ *
+ */
+function validateInitObject(classDef) {
+  if (!xtype.is(classDef, 'object')) {
+    throw new Error('Invalid Store initialization argument. Expected object, got ' + xtype.type(classDef));
+  }
+  if (!xtype.is(classDef.listeners, 'function')) {
+    throw new Error('Could not init Store class. `listeners` is missing or invalid. Expected function, got ' + xtype.type(classDef.listeners));
+  }
+  if (!xtype.is(classDef.state, 'function')) {
+    throw new Error('Could not init Store class. `state` is missing or invalid. Expected function, got ' + xtype.type(classDef.states));
+  }
+  if (!xtype.is(classDef.getters, 'undefined, function')) {
+    throw new Error('Could not init Store class. Getters invalid. Expected function, got' + xtype.type(classDef.getters));
+  }
+}
+
+/**
+ *
+ */
+exports.create = function (classDef) {
+  var
+    data = {},
+    states = {},
+    api = {},
+    emitter = new EventEmitter();
+
+  function createState(name) {
+    var state = State.create(data, name);
+    states[name] = state;
+    api[name] = state.get;
+    return state.def();
+  }
+  
+  function addActionListener(actionID, callback) {
+    if (!actionID) {
+      throw new Error('Empty action identifier');
+    }
+    Dispatcher.register(function (payload) {
+      if (payload.type === actionID) {
+        callback(payload);
+      }
+    });
+  }
+  
+  function setState(values) {
+    var key, changed = {};
+    for (key in values) {
+      if (values.hasOwnProperty(key)) {
+        if (!states[key]) {
+          throw new Error('Undefined state key: ' + key);
+        }
+        if (states[key].set(values[key])) {
+          changed[key] = data[key];
+        }
+      }
+    }
+    if (Object.keys(changed).length > 0) {
+      emitter.emit('change', clone(changed));
+    }
+  }
+  
+  validateInitObject(classDef);
+  
+  //
+  if (classDef.getters) {
+    classDef.getters(api, data);
+  }
+  
+  // Easier functions for change event listening
+  api.onChange = function (callback) {
+    return emitter.addListener('change', callback);
+  };
+  api.removeChangeListener = function (callback) {
+    return emitter.removeListener('change', callback);
+  };
+  api.on = function (name, callback) {
+    return emitter.addListener(name, callback);
+  };
+  api.removeListener = function (name, callback) {
+    return emitter.removeListener(name, callback);
+  };
+  
+  //
+  classDef.state(createState);
+  classDef.listeners(addActionListener, setState, emitter);
+  
+  return api;
+};
