@@ -99,6 +99,19 @@ describe("Store", function () {
       
     });
     
+    it('returns the whole state', function () {
+      var store = Store.create({
+        listeners: function () {},
+        state: function (define) {
+          define('a').init(2);
+          define('b').init(3);
+        }
+      });
+      
+      assert(store.a(), 2);
+      assert(store.b(), 3);
+    });
+    
   });
   
   describe("Listeners & emitters", function () {
