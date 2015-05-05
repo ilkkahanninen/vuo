@@ -26,8 +26,6 @@ module.exports = ActionCreator.create("Auth")
   .publicAPI();
 ```
 
-this.request() has not been implemented yet.
-
 ### Store
 
 ```javascript
