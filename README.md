@@ -5,30 +5,30 @@
 ### ActionCreator
 
 ```javascript
-var ActionCreator = require("vuo").ActionCreator,
-    AuthActions = ActionCreator.create("Auth");
+var ActionCreator = require("vuo").ActionCreator;
 
-AuthActions.action("login", function (username, password) {
-    this.request({
-        post: '/login',
-        data: {
-            username: username,
-            password: password
-        }
-    });
-});
+module.exports = ActionCreator.create("Auth")
 
-AuthActions.action("logout");
-
-module.exports = AuthActions.publicAPI();
+  .action("login", function (username, password) {
+      this.request({
+          post: '/login',
+          data: {
+              username: username,
+              password: password
+          }
+      });
+  })
+  
+  .action("logout")
+  
+  .publicAPI();
 ```
 
 ### Store
 
 ```javascript
 var Store = require("vuo").Store,
-    AuthActions = require('./AuthActions'),
-    AuthStore;
+    AuthActions = require('./AuthActions');
     
 module.exports = Store.create({
     state: function (define) {
