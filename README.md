@@ -5,6 +5,8 @@
 ### ActionCreator
 
 ```javascript
+// AuthActions.js
+
 var ActionCreator = require("vuo").ActionCreator;
 
 module.exports = ActionCreator.create("Auth")
@@ -24,9 +26,13 @@ module.exports = ActionCreator.create("Auth")
   .publicAPI();
 ```
 
+this.request() has not been implemented yet.
+
 ### Store
 
 ```javascript
+// AuthStore.js
+
 var Store = require("vuo").Store,
     AuthActions = require('./AuthActions');
     
@@ -59,19 +65,34 @@ module.exports = Store.create({
 ### React component
 
 ```javascript
+// AuthExample.jsx
+
 var React = require("React"),
-    StoreListener = require("vuo").StoreListener,
-    AuthStore = require('./AuthStore');
+    Vuo = require("vuo-react"),
+    Form = require("vuo-react/components/form"),
+    AuthStore = require('./AuthStore'),
+    AuthActions = require('./AuthActions');
 
 module.exports = React.createClass({
-    mixins: [StoreListener.mixin],
+    mixins: [Vuo.mixin],
     
     bindStores: function () {
-        StoreListener.bindState(AuthStore, "username");
+        Vuo.bindStates(AuthStore, ["username", "loggedIn"]);
     },
     
     render: function () {
-        return <div>{this.state.username || "Not logged in"}</div>;
+        if (this.state.loggedIn) {
+          return <div>Logged in as {this.state.username}</div>;
+        }
+        return (this
+          <Form onSubmit={AuthActions.login}>
+            <label>Username</label><input name="username" type="text"/>
+            <label>Password</label><input name="password" type="password"/>
+            <input type="submit" value="Log in"/>
+          </Form>
+        );
     }
 });
 ```
+
+Work on vuo-react hasn't been started yet.
