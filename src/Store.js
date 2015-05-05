@@ -45,17 +45,6 @@ exports.create = function (classDef) {
     return state.def();
   }
   
-  function addActionListener(actionID, callback) {
-    if (!actionID) {
-      throw new Error('Empty action identifier');
-    }
-    Dispatcher.register(function (payload) {
-      if (payload.type === actionID) {
-        callback(payload);
-      }
-    });
-  }
-  
   function setState(values) {
     var key, changed = {};
     for (key in values) {
@@ -70,6 +59,32 @@ exports.create = function (classDef) {
     }
     if (Object.keys(changed).length > 0) {
       emitter.emit('change', clone(changed));
+    }
+  }
+  
+  function addActionListener(actionID, callback) {
+    if (!actionID) {
+      throw new Error('Null action identifier');
+    }
+    switch (typeof callback) {
+      case 'function':
+        Dispatcher.register(function (payload) {
+          if (payload.type === actionID) {
+            callback(payload);
+          }
+        });
+        break;
+        
+      case 'string':
+        Dispatcher.register(function (payload) {
+          if (payload.type === actionID) {
+            setState({callback: payload.value});
+          }
+        });
+        break;
+        
+      default:
+        throw new Error('Invalid second argument. Expected for a callback function or a state name.');
     }
   }
   

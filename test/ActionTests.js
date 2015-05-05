@@ -6,6 +6,7 @@ var
   Vuo = require('..'),
   ActionCreator = Vuo.ActionCreator,
   Dispatcher = Vuo.Dispatcher,
+  request = require('../src/Request'),
   assert = require('assert');
 
 describe('Actions', function () {
@@ -77,6 +78,32 @@ describe('Actions', function () {
     });
     
     NameAction.setName('Mickey');
+    
+  });
+  
+  it('can request data from server', function (done) {
+    
+    var ServerAction = ActionCreator.create('Server')
+      .action('getText', function () {
+        this.request({
+          get: 'http://jsonplaceholder.typicode.com/users/:id',
+          args: {id: 1}
+        });
+      })
+      .publicAPI();
+    
+    Dispatcher.register(function (payload) {
+      if (payload.type === ServerAction.GET_TEXT) {
+        assert(payload.id, 1);
+        done();
+      }
+      if (payload.type === Vuo.Actions.REQUEST_ERROR) {
+        console.log(payload.error);
+        throw new Error("Request failed: " + payload.error.message);
+      }
+    });
+    
+    ServerAction.getText();
     
   });
   

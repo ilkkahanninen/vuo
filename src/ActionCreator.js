@@ -3,10 +3,12 @@
 
 var
   Dispatcher = require('./Dispatcher'),
-  assign = require('object-assign');
+  assign = require('object-assign'),
+  serverRequest = require('./Request');
 
 exports.create = function (groupName) {
   var
+    requestCounter = 0,
     userAPI = {},
     ctorAPI = {
 
@@ -17,6 +19,12 @@ exports.create = function (groupName) {
 
         userAPI[constName] = actionID;
         if (func) {
+          
+          /*
+           * Action creator inner API
+           */
+          
+          // DISPATCH
           func.dispatch = function (value) {
             if (typeof value === 'object') {
               if (value.type) {
@@ -28,6 +36,18 @@ exports.create = function (groupName) {
             }
           };
           userAPI[name] = func.bind(func);
+          
+          // REQUEST
+          func.request = function (def) {
+            requestCounter += 1;
+            def.id = '#' + requestCounter + ' ' + actionID;
+            if (!def.dispatch) {
+              def.dispatch = actionID;
+            }
+            return serverRequest(def);
+          };
+          
+          
         } else {
           userAPI[name] = function (value) {
             Dispatcher.dispatch({type: actionID, value: value});

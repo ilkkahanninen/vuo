@@ -14,6 +14,11 @@
     "clone": "^1.0.2",
     "flux": "^2.0.3",
     "object-assign": "^2.0.0",
+    "superagent": "^1.2.0",
+    "superagent-mock": "^1.1.0",
     "xtypejs": "^0.2.8"
+  },
+  "devDependencies": {
+    "superagent-mock": "^1.1.0"
   }
 }
