@@ -67,24 +67,24 @@ exports.create = function (classDef) {
       throw new Error('Null action identifier');
     }
     switch (typeof callback) {
-      case 'function':
-        Dispatcher.register(function (payload) {
-          if (payload.type === actionID) {
-            callback(payload);
-          }
-        });
-        break;
-        
-      case 'string':
-        Dispatcher.register(function (payload) {
-          if (payload.type === actionID) {
-            setState({callback: payload.value});
-          }
-        });
-        break;
-        
-      default:
-        throw new Error('Invalid second argument. Expected for a callback function or a state name.');
+    case 'function':
+      Dispatcher.register(function (payload) {
+        if (payload.type === actionID) {
+          callback(payload);
+        }
+      });
+      break;
+
+    case 'string':
+      Dispatcher.register(function (payload) {
+        if (payload.type === actionID) {
+          setState({callback: payload.value});
+        }
+      });
+      break;
+
+    default:
+      throw new Error('Invalid second argument. Expected for a callback function or a state name.');
     }
   }
   
@@ -99,6 +99,10 @@ exports.create = function (classDef) {
       }
     );
   }
+  
+  api.getState = function () {
+    return clone(data);
+  };
   
   // Easier functions for change event listening
   api.onChange = function (callback) {
