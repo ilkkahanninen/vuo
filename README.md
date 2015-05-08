@@ -35,26 +35,26 @@ var Store = require("vuo").Store,
     AuthActions = require('./AuthActions');
     
 module.exports = Store.create({
-    state: function (define) {
-        define("token").is("null, string");
-        define("user").is("null, string");
+    state: function ($) {
+        $.define("token").is("null, string");
+        $.define("user").is("null, string");
     },
 
-    listeners: function (on, setState, emitter) {
-        on(AuthActions.LOGIN, function (payload) {
-            setState({
+    listeners: function ($) {
+        $.on(AuthActions.LOGIN, function (payload) {
+            $.setState({
                 token: payload.token,
                 user: payload.user
             });
         });
-        on(AuthActions.LOGOUT, function () {
-            setState({token: null, user: null});
+        $.on(AuthActions.LOGOUT, function () {
+            $.setState({token: null, user: null});
         });
     },
     
-    getters: function (get, state) {
+    getters: function (get, $) {
         get.loggedIn = function () {
-            return state.token ? true : false;
+            return $.state.token ? true : false;
         }
     }
 });

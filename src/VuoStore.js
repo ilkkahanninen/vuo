@@ -9,15 +9,15 @@ module.exports = Store.create({
   /*
    * Listeners
    */
-  listeners: function (on, setState) {
+  listeners: function ($) {
     // Map payload.value to state.authToken
-    on(VuoActions.SET_AUTH_TOKEN, 'authToken');
+    $.on(VuoActions.SET_AUTH_TOKEN, 'authToken');
   },
   
   /*
    * Initial state
    */
-  state: function (define) {
-    define('authToken').is('undefined, string');
+  state: function ($) {
+    $.define('authToken').is('undefined, string');
   }
 });

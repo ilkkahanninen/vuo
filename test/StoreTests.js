@@ -39,9 +39,8 @@ describe("Store", function () {
       
       // Create a simple store for name
       var store = Store.create({
-        listeners: function () {},
-        state: function (define) {
-          define('secret').protect();
+        state: function ($) {
+          $.define('secret').protect();
         }
       });
       
@@ -53,16 +52,14 @@ describe("Store", function () {
       
       // Create a simple store for name
       var store = Store.create({
-        listeners: function () {},
-        
-        state: function (define) {
-          define('a').is('number').init(2);
-          define('b').is('number').init(3);
+        state: function ($) {
+          $.define('a').is('number').init(2);
+          $.define('b').is('number').init(3);
         },
         
-        getters: function (get, state) {
+        getters: function (get, $) {
           get.sum = function () {
-            return state.a + state.b;
+            return $.state.a + $.state.b;
           };
         }
       });
@@ -80,9 +77,9 @@ describe("Store", function () {
       store = Store.create({
         listeners: function () {},
         
-        state: function (define) {
-          define('object').init({value: 0});
-          define('array').init([0]);
+        state: function ($) {
+          $.define('object').init({value: 0});
+          $.define('array').init([0]);
         }
       });
       
@@ -109,14 +106,14 @@ describe("Store", function () {
       // Create a simple store for name
       store = Store.create({
         
-        listeners: function (on, setState, emit) {
-          on('setName', function (payload) {
-            setState({name: payload.value});
+        listeners: function ($) {
+          $.on('setName', function (payload) {
+            $.setState({name: payload.value});
           });
         },
         
-        state: function (define) {
-          define('name').is('undefined, string').init('Dolan');
+        state: function ($) {
+          $.define('name').is('undefined, string').init('Dolan');
         }
 
       });
@@ -144,15 +141,15 @@ describe("Store", function () {
       // Create a simple store for name
       store = Store.create({
         
-        listeners: function (on, setState, emitter) {
-          on('setName', function (payload) {
-            setState({name: payload.value});
-            assert.equal(emitter.emit('customEvent'), true);
+        listeners: function ($) {
+          $.on('setName', function (payload) {
+            $.setState({name: payload.value});
+            assert.equal($.emitter.emit('customEvent'), true);
           });
         },
         
-        state: function (define) {
-          define('name').is('undefined, string');
+        state: function ($) {
+          $.define('name').is('undefined, string');
         }
 
       });

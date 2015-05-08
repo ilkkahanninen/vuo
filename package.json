@@ -4,7 +4,7 @@
   "description": "Flux framework",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "build": "node node_modules/webpack/bin/webpack.js src vuo.js",
     "watch": "node node_modules/webpack/bin/webpack.js src vuo.js --watch"
   },

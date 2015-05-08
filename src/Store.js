@@ -17,14 +17,14 @@ function validateInitObject(classDef) {
   if (!xtype.is(classDef, 'object')) {
     throw new Error('Invalid Store initialization argument. Expected object, got ' + xtype.type(classDef));
   }
-  if (!xtype.is(classDef.listeners, 'function')) {
-    throw new Error('Could not init Store class. `listeners` is missing or invalid. Expected function, got ' + xtype.type(classDef.listeners));
+  if (!xtype.is(classDef.listeners, 'undefined, function')) {
+    throw new Error('Could not init Store class. Listeners is invalid. Expected function, got ' + xtype.type(classDef.listeners));
   }
   if (!xtype.is(classDef.state, 'function')) {
     throw new Error('Could not init Store class. `state` is missing or invalid. Expected function, got ' + xtype.type(classDef.states));
   }
   if (!xtype.is(classDef.getters, 'undefined, function')) {
-    throw new Error('Could not init Store class. Getters invalid. Expected function, got' + xtype.type(classDef.getters));
+    throw new Error('Could not init Store class. Getters is invalid. Expected function, got' + xtype.type(classDef.getters));
   }
 }
 
@@ -92,7 +92,12 @@ exports.create = function (classDef) {
   
   //
   if (classDef.getters) {
-    classDef.getters(api, data);
+    classDef.getters(
+      api,
+      {
+        state: data
+      }
+    );
   }
   
   // Easier functions for change event listening
@@ -110,8 +115,18 @@ exports.create = function (classDef) {
   };
   
   //
-  classDef.state(createState);
-  classDef.listeners(addActionListener, setState, emitter);
+  classDef.state({
+    define: createState
+  });
+  
+  if (classDef.listeners) {
+    classDef.listeners({
+      on: addActionListener,
+      setState: setState,
+      state: data,
+      emitter: emitter
+    });
+  }
   
   return api;
 };
