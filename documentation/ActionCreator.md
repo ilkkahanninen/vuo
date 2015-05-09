@@ -106,3 +106,17 @@ Calling **MyAction.getItems("cutlery")** sends a POST request to **/updateTags**
   "items": ["spoon", "fork", "knife", "spork"]
 }
 ```
+
+## RESTful resource
+
+```javascript
+var MyActions = ActionCrator.create("MyActions")
+  .resource("user", "/api/user/:id");
+```
+
+The example code exposes following methods:
+
+* MyActions.user.get(id)
+* MyActions.user.query()
+* MyActions.user.set(id, value)
+* MyActions.user.remove(id)

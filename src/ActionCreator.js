@@ -47,12 +47,51 @@ exports.create = function (groupName) {
             return serverRequest(def);
           };
           
-          
         } else {
           userAPI[name] = function (value) {
             Dispatcher.dispatch({type: actionID, value: value});
           };
         }
+        
+        return ctorAPI;
+      },
+      
+      // RESTFUL RESOURCE
+      resource: function (resourceName, url) {
+        
+        function createRequestFunc(name, url, method, sendID) {
+          var
+            actionID = groupName + '.' + resourceName + '.' + name,
+            constName = (resourceName + '_' + name).replace(/([a-z])([A-Z])/g, '$1_$2').toUpperCase(); // camelCase to CAMEL_CASE
+          
+          userAPI[constName] = actionID;
+          
+          return function (id, value, def) {
+            requestCounter += 1;
+            var
+              reqURL = url.replace(/\/:(\w)+/, sendID ? '/' + id : ''),
+              request = assign({}, def, {
+                id: '#' + requestCounter + actionID,
+                dispatch: actionID
+              });
+            request[method] = reqURL;
+            if (value) {
+              if (typeof value === 'object') {
+                request.data = value;
+              } else {
+                request.data = {value: value};
+              }
+            }
+            serverRequest(request);
+          };
+        }
+        
+        userAPI[resourceName] = {
+          get:    createRequestFunc('get', url, 'get', true),
+          query:  createRequestFunc('query', url, 'get', false),
+          set:    createRequestFunc('set', url, 'post', true),
+          remove: createRequestFunc('remove', url, 'delete', true)
+        };
         
         return ctorAPI;
       },

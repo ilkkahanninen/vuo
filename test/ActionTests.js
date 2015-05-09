@@ -98,13 +98,39 @@ describe('Actions', function () {
         done();
       }
       if (payload.type === Vuo.Actions.REQUEST_ERROR) {
-        console.log(payload.error);
         throw new Error("Request failed: " + payload.error.message);
       }
     });
     
     ServerAction.getText();
     
+  });
+  
+  describe("Restful resource", function () {
+    it('creates a restful resource', function (done) {
+
+      var RestAction = ActionCreator.create('Rest')
+        .resource('users', 'http://jsonplaceholder.typicode.com/users/:id')
+        .publicAPI();
+
+      // Functions exist
+      assert(typeof RestAction.users.get, 'function');
+      assert(typeof RestAction.users.query, 'function');
+      assert(typeof RestAction.users.set, 'function');
+      assert(typeof RestAction.users.remove, 'function');
+      
+      // Test get
+      Dispatcher.register(function (payload) {
+        if (payload.type === RestAction.USERS_GET) {
+          done();
+        }
+        if (payload.type === Vuo.Actions.REQUEST_ERROR) {
+          throw new Error("Request failed: " + payload.error.message);
+        }
+      });
+
+      RestAction.users.get(1);
+    });
   });
   
 });
