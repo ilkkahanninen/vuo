@@ -39,7 +39,7 @@ exports.create = function (classDef) {
     emitter = new EventEmitter();
 
   function createState(name) {
-    var state = State.create(data, name);
+    var state = State.create(data, name, classDef.name);
     states[name] = state;
     api[name] = state.get;
     return state.def();

@@ -1,15 +1,22 @@
 /*jslint node: true*/
+/*global window*/
 
 "use strict";
 
 var
   xtype = require('xtypejs'),
-  clone = require('clone');
+  clone = require('clone'),
+  supportsLocalStorage = (typeof window !== 'undefined' && window.localStorage) ? true : false;
 
-exports.create = function (obj, name) {
+exports.create = function (obj, name, namespace) {
   
-  var validation = [], isPublic = true;
-  obj[name] = null;
+  var
+    validation = [],
+    isPublic = true,
+    storageID = (namespace || 'Global') + ':' + name,
+    stored;
+  obj[name] = undefined;
+  
   
   return {
     def: function () {
@@ -34,11 +41,23 @@ exports.create = function (obj, name) {
       
       // state().init()
       self.init = function (value) {
-        obj[name] = value;
+        if (obj[name] === undefined) {
+          obj[name] = value;
+        }
+        if (stored === 'local' && supportsLocalStorage) {
+          window.localStorage[storageID] = value;
+        }
         return self;
       };
       
-      // TODO: state().storedLocally()      
+      // state().storeLocally()
+      self.storeLocally = function () {
+        stored = 'local';
+        if (supportsLocalStorage) {
+          obj[name] = window.localStorage[storageID];
+        }
+        return self;
+      };
       
       return self;
     },
@@ -50,6 +69,13 @@ exports.create = function (obj, name) {
       });
       diff = (obj[name] !== value);
       obj[name] = value;
+      
+      if (stored === 'local') {
+        if (supportsLocalStorage) {
+          window.localStorage[storageID] = value;
+        }
+      }
+      
       return diff;
     },
     

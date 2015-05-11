@@ -3,6 +3,11 @@
 
 "use strict";
 
+// Mock window.localStorage
+global.window = {
+  localStorage: {}
+};
+
 var
   Vuo = require('..'),
   Store = Vuo.Store,
@@ -108,6 +113,24 @@ describe("Store", function () {
       assert(store.a(), 2);
       assert(store.b(), 3);
       assert(store.getState(), {a: 2, b: 3});
+    });
+
+    it('saves to local storage', function () {
+      var store1 = Store.create({
+        name: 'TestStore',
+        state: function ($) {
+          $.define('a').storeLocally().init(2);
+        }
+      });
+
+      var store2 = Store.create({
+        name: 'TestStore',
+        state: function ($) {
+          $.define('a').storeLocally().init(9999);
+        }
+      });
+      
+      assert(store1.a(), store2.a());
     });
     
   });
