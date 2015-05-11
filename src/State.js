@@ -8,6 +8,10 @@ var
   clone = require('clone'),
   supportsLocalStorage = (typeof window !== 'undefined' && window.localStorage) ? true : false;
 
+if (!supportsLocalStorage) {
+  console.log('Warning: Local storage not supported');
+}
+
 exports.create = function (obj, name, namespace) {
   
   var
@@ -45,16 +49,21 @@ exports.create = function (obj, name, namespace) {
           obj[name] = value;
         }
         if (stored === 'local' && supportsLocalStorage) {
-          window.localStorage[storageID] = value;
+          window.localStorage[storageID] = JSON.stringify(value);
         }
         return self;
       };
       
       // state().storeLocally()
       self.storeLocally = function () {
+        var value;
         stored = 'local';
         if (supportsLocalStorage) {
-          obj[name] = window.localStorage[storageID];
+          try {
+            obj[name] = JSON.parse(window.localStorage[storageID]);
+          } catch(e) {
+            obj[name] = undefined;
+          }
         }
         return self;
       };
@@ -72,7 +81,7 @@ exports.create = function (obj, name, namespace) {
       
       if (stored === 'local') {
         if (supportsLocalStorage) {
-          window.localStorage[storageID] = value;
+          window.localStorage[storageID] = JSON.stringify(value);
         }
       }
       

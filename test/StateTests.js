@@ -3,6 +3,12 @@
 
 "use strict";
 
+// Mock window.localStorage
+global.window = {
+  localStorage: {}
+};
+
+
 var
   State = require('../src/State'),
   assert = require('assert');
@@ -41,5 +47,21 @@ describe("State", function () {
     state.def().is('string');
     assert.throws(function () { state.set(303); });
   });
-  
+
+  it('stores an object to local storage correctly', function () {
+    var
+      states = {},
+      state = State.create(states, 'obj', 'MyNamespace');
+    
+    state.def().is('object').storeLocally();
+    state.set({name: 'Wilco'});
+    
+    // Create state again
+    state = State.create(states, 'obj', 'MyNamespace');
+    state.def().is('object').storeLocally();
+
+    assert(state.get().name, 'Wilco');
+
+  });
+
 });
