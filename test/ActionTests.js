@@ -1,5 +1,5 @@
 /*jslint node: true*/
-/*global describe, it*/
+/*global describe, it, afterEach*/
 "use strict";
 
 var
@@ -10,6 +10,11 @@ var
   assert = require('assert');
 
 describe('Actions', function () {
+  var listenerID;
+  
+  afterEach(function () {
+    try { Dispatcher.unregister(listenerID); } catch(e) {}
+  });
   
   it('just works', function (done) {
     
@@ -21,7 +26,7 @@ describe('Actions', function () {
     // Test things
     assert(NameAction.SET_NAME, 'Test.setName');
     
-    Dispatcher.register(function (payload) {
+    listenerID = Dispatcher.register(function (payload) {
       if (payload.type === NameAction.SET_NAME) {
         assert(payload.value, 'Mickey');
         done();
@@ -69,7 +74,7 @@ describe('Actions', function () {
     // Test things
     assert(NameAction.SET_NAME, 'Test3.setName');
     
-    Dispatcher.register(function (payload) {
+    listenerID = Dispatcher.register(function (payload) {
       if (payload.type === NameAction.SET_NAME) {
         assert(payload.value, 'Mickey');
         assert(payload.lowercase, 'mickey');
@@ -92,7 +97,7 @@ describe('Actions', function () {
       })
       .publicAPI();
     
-    Dispatcher.register(function (payload) {
+    listenerID = Dispatcher.register(function (payload) {
       if (payload.type === ServerAction.GET_TEXT) {
         assert(payload.id, 1);
         done();
@@ -104,6 +109,23 @@ describe('Actions', function () {
     
     ServerAction.getText();
     
+  });
+
+  it('sends error message on request fail', function (done) {
+    
+    var ServerAction = ActionCreator.create('Server')
+      .action('getText', function () {
+        this.request({get: 'sudhfdisbgsdufghdfughdpfguhdfpgudhf'});
+      })
+      .publicAPI();
+    
+    listenerID = Dispatcher.register(function (payload) {
+      if (payload.type === ServerAction.GET_TEXT_ERROR) {
+        done();
+      }
+    });
+    
+    ServerAction.getText();    
   });
   
   describe("Restful resource", function () {
@@ -120,7 +142,7 @@ describe('Actions', function () {
       assert(typeof RestAction.users.remove, 'function');
       
       // Test get
-      Dispatcher.register(function (payload) {
+      listenerID = Dispatcher.register(function (payload) {
         if (payload.type === RestAction.USERS_GET) {
           done();
         }

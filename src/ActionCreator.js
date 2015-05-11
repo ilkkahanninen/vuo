@@ -18,7 +18,10 @@ exports.create = function (groupName) {
           constName = name.replace(/([a-z])([A-Z])/g, '$1_$2').toUpperCase(); // camelCase to CAMEL_CASE
 
         userAPI[constName] = actionID;
+        
         if (func) {
+          
+          userAPI[constName + '_ERROR'] = actionID + '.error'; // Used when request fails
           
           /*
            * Action creator inner API
@@ -40,6 +43,7 @@ exports.create = function (groupName) {
           // REQUEST
           func.request = function (def) {
             requestCounter += 1;
+            def.actionID = actionID;
             def.id = '#' + requestCounter + ' ' + actionID;
             if (!def.dispatch) {
               def.dispatch = actionID;
@@ -65,12 +69,14 @@ exports.create = function (groupName) {
             constName = (resourceName + '_' + name).replace(/([a-z])([A-Z])/g, '$1_$2').toUpperCase(); // camelCase to CAMEL_CASE
           
           userAPI[constName] = actionID;
+          userAPI[constName + '_ERROR'] = actionID + '.error';
           
           return function (id, value, def) {
             requestCounter += 1;
             var
               reqURL = url.replace(/\/:(\w)+/, sendID ? '/' + id : ''),
               request = assign({}, def, {
+                actionID: actionID,
                 id: '#' + requestCounter + actionID,
                 dispatch: actionID
               });

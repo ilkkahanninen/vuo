@@ -64,10 +64,11 @@ module.exports = function (args) {
     var payload;
     VuoActions.requestEnd(args.id);
     if (err) {
-      VuoActions.requestError(args.id, err);
       if (typeof args.onError === 'function') {
         args.onError(err);
       }
+      VuoActions.requestError(args.id, err);
+      Dispatcher.dispatch({type: args.actionID + '.error', error: err});
     } else {
       if (typeof args.onComplete === 'function') {
         args.onComplete(response.body);
