@@ -20,7 +20,7 @@ function buildURI(path, args) {
 module.exports = function (args) {
   var
     VuoActions  = require('./VuoActions'),
-    VuoStore    = require('./VuoStore'),
+    Config      = require('./Config'),
     request;
   
   if (typeof args !== 'object') {
@@ -48,7 +48,7 @@ module.exports = function (args) {
   // Authorization token
 
   if (args.authorize) {
-    request.set({Authorization: VuoStore.authToken()});
+    request.set({Authorization: Config.authToken});
   }
   
   // Data

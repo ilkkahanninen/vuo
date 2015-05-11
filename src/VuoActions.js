@@ -3,7 +3,6 @@
 var ActionCreator = require('..').ActionCreator;
 
 module.exports = ActionCreator.create("VuoActions")
-  .action("setAuthToken")
   .action("requestBegin", function (id) {
     this.dispatch({id: id});
   })
