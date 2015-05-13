@@ -1,6 +1,6 @@
 {
   "name": "vuo",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "Flux framework",
   "main": "index.js",
   "scripts": {
