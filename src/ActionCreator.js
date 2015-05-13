@@ -61,7 +61,7 @@ exports.create = function (groupName) {
       },
       
       // RESTFUL RESOURCE
-      resource: function (resourceName, url) {
+      resource: function (resourceName, url, options) {
         
         function createRequestFunc(name, url, method, sendID) {
           var
@@ -75,7 +75,7 @@ exports.create = function (groupName) {
             requestCounter += 1;
             var
               reqURL = url.replace(/\/:(\w)+/, sendID ? '/' + id : ''),
-              request = assign({}, def, {
+              request = assign({}, def, options || {}, {
                 actionID: actionID,
                 id: '#' + requestCounter + actionID,
                 dispatch: actionID
