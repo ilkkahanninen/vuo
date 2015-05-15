@@ -22,43 +22,31 @@ describe("State", function () {
   it('inits state object', function () {
     var
       states = {},
-      state = State.create(states, 'name');
+      state = State.create('name');
     
     assert(state.set);
-    assert(state.def);
+    assert(state.get);
   });
 
   it('validates string correctly', function () {
-    var
-      states = {},
-      state = State.create(states, 'name');
-    
-    state.def().is('string');
+    var state = State.create('name', 'MyNamespace', 'string');
     
     state.set('Wilco');
-    assert(states.name, 'Wilco');
+    assert(state.get(), 'Wilco');
   });
 
   it('validates invalid string correctly', function () {
-    var
-      states = {},
-      state = State.create(states, 'name');
-    
-    state.def().is('string');
+    var state = State.create('name', 'MyNamespace', 'string');
     assert.throws(function () { state.set(303); });
   });
 
   it('stores an object to local storage correctly', function () {
-    var
-      states = {},
-      state = State.create(states, 'obj', 'MyNamespace');
+    var state = State.create('obj', 'MyNamespace', 'object', {}, State.storeLocally());
     
-    state.def().is('object').storeLocally();
     state.set({name: 'Wilco'});
     
     // Create state again
-    state = State.create(states, 'obj', 'MyNamespace');
-    state.def().is('object').storeLocally();
+    state = State.create('obj', 'MyNamespace', 'object', {}, State.storeLocally());
 
     assert(state.get().name, 'Wilco');
 

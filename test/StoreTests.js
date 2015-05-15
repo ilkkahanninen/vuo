@@ -11,6 +11,7 @@ global.window = {
 var
   Vuo = require('..'),
   Store = Vuo.Store,
+  State = Vuo.State,
   Dispatcher = Vuo.Dispatcher,
   assert = require('assert');
 
@@ -20,34 +21,23 @@ describe("Store", function () {
     assert(Store);
   });
   
-  describe("Init object validation", function () {
-    it('Accepts a valid object', function () {
-      Store.create({
-        listeners: function () {},
-        state: function () {},
-        getters: function () {}
-      });
-    });
-    
-    it('Fails on invalid arguments', function () {
-      [null, 'Hello', 123, function () {}].forEach(function (args) {
-        assert.throws(function () {
-          Store.create(args);
-        });
-      });
-    });
-  });
-  
   describe("Getters", function () {
+    
+    it('publishes a working getter function for a state', function () {
+      
+      // Create a simple store for name
+      var store = new Store("Test")
+        .addState("myValue", "string", "LOL")
+        .functions;
+      assert.equal(store.myValue(), "LOL");
+    });
     
     it('throws on exception if one tries to get a protected state', function () {
       
       // Create a simple store for name
-      var store = Store.create({
-        state: function ($) {
-          $.define('secret').protect();
-        }
-      });
+      var store = new Store("Test")
+        .addState("secret", "string", "LOL", State.protect())
+        .functions;
       
       // Check state
       assert.throws(function () { store.secret(); });
@@ -56,59 +46,38 @@ describe("Store", function () {
     it('returns a value from a custom getter', function () {
       
       // Create a simple store for name
-      var store = Store.create({
-        state: function ($) {
-          $.define('a').is('number').init(2);
-          $.define('b').is('number').init(3);
-        },
-        
-        getters: function (get, $) {
-          get.sum = function () {
-            return $.state.a + $.state.b;
-          };
-        }
-      });
+      var store = new Store("Test")
+        .addState("a", "number", 2)
+        .addState("b", "number", 3)
+        .declare("sum", function () {
+          return this.state.a + this.state.b;
+        })
+        .functions;
       
-      // Check state
-      assert(store.a(), 2);
-      assert(store.b(), 3);
-      assert(store.sum(), 5);
+      assert.equal(store.a(), 2);
+      assert.equal(store.b(), 3);
     });
 
     it('does\'t return the original version of object', function () {
-      var store, obj1, obj2, ary1, ary2;
+      var store, obj1, obj2;
       
       // Create a simple store for name
-      store = Store.create({
-        listeners: function () {},
-        
-        state: function ($) {
-          $.define('object').init({value: 0});
-          $.define('array').init([0]);
-        }
-      });
+      store = new Store("Test")
+        .addState("object", "object", {value: 0})
+        .functions;
       
       // Check state
       obj1 = store.object();
       obj2 = store.object();
       obj1.value = 1;
       assert.notEqual(obj1.value, obj2.value);
-      
-      ary1 = store.array();
-      ary2 = store.array();
-      ary1[0] = 1;
-      assert.notEqual(ary1[0], ary2[0]);
-      
     });
     
     it('returns the whole state', function () {
-      var store = Store.create({
-        listeners: function () {},
-        state: function ($) {
-          $.define('a').init(2);
-          $.define('b').init(3);
-        }
-      });
+      var store = new Store("test")
+        .addState("a", "number", 2)
+        .addState("b", "number", 3)
+        .functions;
       
       assert(store.a(), 2);
       assert(store.b(), 3);
@@ -116,19 +85,14 @@ describe("Store", function () {
     });
 
     it('saves to local storage', function () {
-      var store1 = Store.create({
-        name: 'TestStore',
-        state: function ($) {
-          $.define('a').storeLocally().init(2);
-        }
-      });
+      var store1 = new Store("Test")
+        .addState("a", "number", 2, State.storeLocally())
+        .functions,
 
-      var store2 = Store.create({
-        name: 'TestStore',
-        state: function ($) {
-          $.define('a').storeLocally().init(9999);
-        }
-      });
+      // Because store2 has same store and state name it should get the value (2) from local storage, saved by store1
+        store2 = new Store("Test")
+        .addState("a", "number", 999999999, State.storeLocally())
+        .functions;
       
       assert(store1.a(), store2.a());
     });
@@ -138,88 +102,52 @@ describe("Store", function () {
   describe("Listeners & emitters", function () {
     
     it('should not emit a change event if the state does not really change', function (done) {
-      var store, listenerCount;
+      var store;
       
       // Create a simple store for name
-      store = Store.create({
-        
-        listeners: function ($) {
-          $.on('setName', function (payload) {
-            $.setState({name: payload.value});
-          });
-        },
-        
-        state: function ($) {
-          $.define('name').is('undefined, string').init('Dolan');
-        }
-
-      });
+      store = new Store("Test")
+        .addState('name', 'string', 'Dolan')
+        .on('setName', function (payload) {
+          this.setState({name: payload.value});
+        })
+        .functions;
 
       // Listen to changes
-      function onChange() {
-        store.offChange(onChange);
+      function onChange(x) {
         throw new Error('Should not emit the event');
       }
-      store.onChange(onChange);
+      store.on('change', onChange);
       
       // Dispatch message
       Dispatcher.dispatch({type: 'setName', value: 'Dolan'});
       
       //
       setTimeout(function () {
-        store.removeChangeListener(onChange);
+        store.removeListener('change', onChange);
         done();
       }, 10);
     });
     
     it('changes a state after an action', function (done) {
-      var store, listenerCount;
+      var store;
       
       // Create a simple store for name
-      store = Store.create({
-        
-        listeners: function ($) {
-          $.on('setName', function (payload) {
-            $.setState({name: payload.value});
-            assert.equal($.emitter.emit('customEvent'), true);
-          });
-        },
-        
-        state: function ($) {
-          $.define('name').is('undefined, string');
-        }
-
-      });
+      store = new Store("Test")
+        .addState('name', 'string', 'Dolan')
+        .on('setName2', function (payload) {
+          this.setState({name: payload.value});
+        })
+        .functions;
 
       // Listen to changes
-      listenerCount = 2;
-
-      function checkExit() {
-        listenerCount -= 1;
-        if (listenerCount === 0) {
-          done();
-        }
+      function onChange(newStates) {
+        assert.equal(newStates.name, "Gooby");
+        done();
       }
-      
-      function onChange(changed) {
-        store.removeChangeListener(onChange);
-        assert(changed.name, 'Goofy');
-        checkExit();
-      }
-      
-      function onCustomEvent() {
-        store.removeListener('customEvent', onChange);
-        checkExit();
-      }
-
-      store.on('customEvent', onCustomEvent);
-      store.onChange(onChange);
+      store.on('change', onChange);
       
       // Dispatch message
-      Dispatcher.dispatch({type: 'setName', value: 'Goofy'});
-      
-      // Check state
-      assert(store.name(), "Goofy");
+      Dispatcher.dispatch({type: 'setName2', value: 'Gooby'});
     });
     
   });

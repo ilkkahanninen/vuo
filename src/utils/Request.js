@@ -22,7 +22,6 @@ function buildURI(path, args) {
 module.exports = function (args) {
   var
     VuoActions  = require('../framework/VuoActions'),
-    Config      = require('../Config'),
     request;
   
   if (typeof args !== 'object') {

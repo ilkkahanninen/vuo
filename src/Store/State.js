@@ -4,100 +4,92 @@
 "use strict";
 
 var
-  xtype = require('xtypejs'),
-  clone = require('clone'),
-  supportsLocalStorage = (typeof window !== 'undefined' && window.localStorage) ? true : false;
+  TypeValidator = require('./TypeValidator'),
+  LocalStorage  = require('./LocalStorage'),
+  clone = require('clone');
 
-if (!supportsLocalStorage) {
-  console.log('Warning: Local storage not supported');
+/*
+** CONSTRUCTOR
+*/
+
+function State(name, namespace, type, initialValue, initializers) {
+  var self = this;
+  
+  this.namespace = namespace || 'Global';
+  this.name = name;
+  this.isPublic = true;
+  this.setHandlers = [];
+  
+  if (typeof type === 'string') {
+    this.setHandlers.push(new TypeValidator(type));
+  }
+  
+  if (initializers) {
+    if (!(initializers instanceof Array)) {
+      initializers = [initializers];
+    }
+    initializers.forEach(function (init) {
+      init.call(self);
+    });
+  }
+  
+  this.set(initialValue);
 }
 
-exports.create = function (obj, name, namespace) {
-  
-  var
-    validation = [],
-    isPublic = true,
-    storageID = (namespace || 'Global') + ':' + name,
-    stored;
-  obj[name] = undefined;
-  
-  
-  return {
-    def: function () {
-      var self = this;
-      
-      // .is(def) - Adds xtype validation for value
-      self.is = function (type) {
-        validation.push(function (value) {
-          if (!xtype.is(value, type)) {
-            throw new Error('Type of value invalid. Expected ' + type + ', got ' + xtype.type(value) + ': ' + value);
-          }
-          return value;
-        });
-        return self;
-      };
-      
-      // state().protect()
-      self.protect = function () {
-        isPublic = false;
-        return self;
-      };
-      
-      // state().init()
-      self.init = function (value) {
-        if (obj[name] === undefined) {
-          obj[name] = value;
-        }
-        if (stored === 'local' && supportsLocalStorage) {
-          window.localStorage[storageID] = JSON.stringify(value);
-        }
-        return self;
-      };
-      
-      // state().storeLocally()
-      self.storeLocally = function () {
-        var value;
-        stored = 'local';
-        if (supportsLocalStorage) {
-          try {
-            obj[name] = JSON.parse(window.localStorage[storageID]);
-          } catch(e) {
-            obj[name] = undefined;
-          }
-        }
-        return self;
-      };
-      
-      return self;
-    },
-    
-    set: function (value) {
-      var diff = false;
-      validation.forEach(function (validate) {
-        value = validate(value);
-      });
-      diff = (obj[name] !== value);
-      obj[name] = value;
-      
-      if (stored === 'local') {
-        if (supportsLocalStorage) {
-          window.localStorage[storageID] = JSON.stringify(value);
-        }
-      }
-      
-      return diff;
-    },
-    
-    get: function () {
-      var value;
-      if (!isPublic) {
-        throw new Error('Cannot access protected state `' + name + '`');
-      }
-      value = obj[name];
-      if (typeof value === 'object') {
-        return clone(value);
-      }
-      return value;
-    }
+/*
+** ACCESSORS
+*/
+State.prototype.set = function (value) {
+  var oldValue = this.value;
+
+  // Validate new value & do stuff
+  this.setHandlers.forEach(function (handler) {
+    value = handler.set(value);
+  });
+
+  // Store state
+  this.value = value;
+  return value !== oldValue;
+};
+
+State.prototype.get = function () {
+  if (!this.isPublic) {
+    throw new Error("Tried to access a protected state " + this.namespace + ":" + this.name);
+  }
+  return clone(this.value);
+};
+
+/*
+** EASE OF ACCESS HELPER
+*/
+
+State.create = function (name, namespace, type, initialValue, initializers) {
+  return new State(name, namespace, type, initialValue, initializers);
+};
+
+/*
+** INITIALIZERS
+**
+** Initializers are always second order functions so the user doesn't have to
+** remember when to use parenthesis and when not.
+*/
+
+State.protect = function () {
+  return function () {
+    this.isPublic = false;
   };
 };
+
+State.storeLocally = function () {
+  return function () {
+    var storage = new LocalStorage(this.namespace, this.name);
+    this.setHandlers.push(storage);
+    this.value = storage.get(this.value);
+  };
+};
+
+/*
+** EXPORTS
+*/
+
+module.exports = State;

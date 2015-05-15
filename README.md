@@ -7,10 +7,9 @@
 ```javascript
 // AuthActions.js
 
-var ActionCreator = require("vuo").ActionCreator,
-    AuthActions   = new ActionCreator("Auth", module.exports);
+var ActionCreator = require("vuo").ActionCreator;
 
-AuthActions
+ActionCreator.create("Auth", module.exports)
 
   .action("login", function (form) {
       this.request({
@@ -19,7 +18,9 @@ AuthActions
       });
   })
   
-  .action("logout");
+  .action("logout")
+  
+  .resource("userData", "/api/users/:id");
 ```
 
 ### Store
@@ -28,32 +29,33 @@ AuthActions
 // AuthStore.js
 
 var Store = require("vuo").Store,
-    AuthActions = require('./AuthActions');
+    AuthActions = require('./AuthActions'),
     
-module.exports = Store.create({
-    state: function ($) {
-        $.define("token").is("null, string");
-        $.define("user").is("null, string");
-    },
+Store.create("Auth", module.exports)
 
-    listeners: function ($) {
-        $.on(AuthActions.LOGIN, function (payload) {
-            $.setState({
-                token: payload.token,
-                user: payload.user
-            });
-        });
-        $.on(AuthActions.LOGOUT, function () {
-            $.setState({token: null, user: null});
-        });
-    },
+    // States
+    .addState("token",      "null, string",   null,   State.storeLocally())
+    .addState("user",       "null, object",   null,   State.storeLocally())
+    .addState("userData",   "object",         {})
     
-    getters: function (get, $) {
-        get.loggedIn = function () {
-            return $.state.token ? true : false;
-        }
-    }
-});
+    // Listeners
+    .on(AuthActions.LOGIN, function (payload) {
+        this.setState({
+            token:  payload.token,
+            user:   payload.user
+        });
+    })
+    
+    .on(AuthActions.LOGOUT, function (payload) {
+        this.setState({token: null, user: null});
+    })
+    
+    .on(AuthActions.USER_DATA_QUERY, "userData")
+    
+    // Custom getters
+    .declare('loggedIn', function () {
+        return this.state.token ? true : false;
+    });
 ```
 
 ### React component
