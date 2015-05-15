@@ -3,7 +3,9 @@
 
 var
   SuperAgent  = require('superagent'),
-  Dispatcher  = require('../Dispatcher');
+  Dispatcher  = require('../Dispatcher'),
+  assign      = require('object-assign'),
+  headers     = {};
 
 function buildURI(path, args) {
   var i;
@@ -45,11 +47,9 @@ module.exports = function (args) {
     throw new Error('Verb not found:', args);
   }
   
-  // Authorization token
+  // Authorization token etc.
 
-  if (args.authorize) {
-    request.set({Authorization: Config.authToken});
-  }
+  request.set(headers);
   
   // Data
   
@@ -78,10 +78,19 @@ module.exports = function (args) {
         payload.type = args.dispatch;
         Dispatcher.dispatch(payload);
       }
-    }    
+    }
   });
   
   return request;
 };
 
 module.exports.SuperAgent = SuperAgent;
+
+module.exports.reset = function () {
+  headers = {};
+};
+
+module.exports.set = function (newHeaders) {
+  assign(headers, newHeaders);
+};
+
