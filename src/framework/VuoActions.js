@@ -1,18 +1,24 @@
 /*jslint node: true*/
+"use strict";
 
-var ActionCreator = require('..').ActionCreator;
+var
+  ActionCreator = require('../..').ActionCreator,
+  VuoActions = new ActionCreator("VuoActions", module.exports);
 
-module.exports = ActionCreator.create("VuoActions")
+VuoActions
+
   .action("requestBegin", function (id) {
     this.dispatch({id: id});
   })
+
   .action("requestEnd", function (id) {
     this.dispatch({id: id});
   })
+
   .action("requestProgress", function (id, progress) {
     this.dispatch({id: id, value: progress});
   })
+
   .action("requestError", function (id, error) {
     this.dispatch({id: id, error: error});
-  })
-  .publicAPI();
+  });

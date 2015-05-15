@@ -2,18 +2,42 @@
 /*global describe, it, afterEach*/
 "use strict";
 
+// Mock window.localStorage
+global.window = {
+  localStorage: {}
+};
+
 var
   Vuo = require('..'),
   ActionCreator = Vuo.ActionCreator,
   Dispatcher = Vuo.Dispatcher,
-  request = require('../src/Request'),
+  request = require('../src/utils/Request'),
   assert = require('assert');
+
+describe('ActionCreator', function () {
+  it('creates correct IDs', function () {
+    var Actions = new ActionCreator('Test');
+    assert.equal(Actions.getID('setName'), 'Test.setName');
+    assert.equal(Actions.getID('names', 'set'), 'Test.names.set');
+    assert.equal(Actions.getConst('setName'), 'SET_NAME');
+    assert.equal(Actions.getConst('names', 'set'), 'NAMES_SET');
+    assert.equal(Actions.createRequestID('getNames'), '1# Test.getNames');
+  });
+
+  it('creates correct IDs for an action', function () {
+    var Actions = new ActionCreator('Test');
+    Actions.action("foo");
+    Actions.resource("bar", "/whatever/:id");
+    assert.equal(Actions.functions.FOO, 'Test.foo');
+    assert.equal(Actions.functions.BAR_GET, 'Test.bar.get');
+  });
+});
 
 describe('Actions', function () {
   var listenerID;
   
   afterEach(function () {
-    try { Dispatcher.unregister(listenerID); } catch(e) {}
+    try { Dispatcher.unregister(listenerID); } catch (e) {}
   });
   
   it('just works', function (done) {
@@ -21,7 +45,7 @@ describe('Actions', function () {
     // Create simple action creator
     var NameAction = ActionCreator.create('Test')
       .action('setName')
-      .publicAPI();
+      .functions;
 
     // Test things
     assert(NameAction.SET_NAME, 'Test.setName');
@@ -43,7 +67,7 @@ describe('Actions', function () {
       .action('setName', function (value) {
         this.dispatch(value.toUpperCase());
       })
-      .publicAPI();
+      .functions;
 
     // Test things
     assert(NameAction.SET_NAME, 'Test2.setName');
@@ -69,7 +93,7 @@ describe('Actions', function () {
           lowercase: value.toLowerCase()
         });
       })
-      .publicAPI();
+      .functions;
 
     // Test things
     assert(NameAction.SET_NAME, 'Test3.setName');
@@ -95,7 +119,7 @@ describe('Actions', function () {
           args: {id: 1}
         });
       })
-      .publicAPI();
+      .functions;
     
     listenerID = Dispatcher.register(function (payload) {
       if (payload.type === ServerAction.GET_TEXT) {
@@ -117,7 +141,7 @@ describe('Actions', function () {
       .action('getText', function () {
         this.request({get: 'sudhfdisbgsdufghdfughdpfguhdfpgudhf'});
       })
-      .publicAPI();
+      .functions;
     
     listenerID = Dispatcher.register(function (payload) {
       if (payload.type === ServerAction.GET_TEXT_ERROR) {
@@ -125,7 +149,7 @@ describe('Actions', function () {
       }
     });
     
-    ServerAction.getText();    
+    ServerAction.getText();
   });
   
   describe("Restful resource", function () {
@@ -133,7 +157,7 @@ describe('Actions', function () {
 
       var RestAction = ActionCreator.create('Rest')
         .resource('users', 'http://jsonplaceholder.typicode.com/users/:id')
-        .publicAPI();
+        .functions;
 
       // Functions exist
       assert(typeof RestAction.users.get, 'function');

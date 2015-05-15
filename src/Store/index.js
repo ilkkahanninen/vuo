@@ -5,7 +5,7 @@
 var
   State = require('./State'),
   xtype = require('xtypejs'),
-  Dispatcher = require('./Dispatcher'),
+  Dispatcher = require('../Dispatcher'),
   EventEmitter = require('events').EventEmitter,
   assign = require('object-assign'),
   clone = require('clone');

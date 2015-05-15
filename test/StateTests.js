@@ -10,7 +10,7 @@ global.window = {
 
 
 var
-  State = require('../src/State'),
+  State = require('../src/Store/State'),
   assert = require('assert');
 
 describe("State", function () {

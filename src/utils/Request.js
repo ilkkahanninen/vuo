@@ -3,7 +3,7 @@
 
 var
   SuperAgent  = require('superagent'),
-  Dispatcher  = require('./Dispatcher');
+  Dispatcher  = require('../Dispatcher');
 
 function buildURI(path, args) {
   var i;
@@ -19,8 +19,8 @@ function buildURI(path, args) {
 
 module.exports = function (args) {
   var
-    VuoActions  = require('./VuoActions'),
-    Config      = require('./Config'),
+    VuoActions  = require('../framework/VuoActions'),
+    Config      = require('../Config'),
     request;
   
   if (typeof args !== 'object') {
