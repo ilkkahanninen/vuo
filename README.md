@@ -60,20 +60,21 @@ Store.create("Auth", module.exports)
 
 ### React component
 
+Notice: vuo-react is a separate project.
+
 ```javascript
 // AuthExample.jsx
 
-var React = require("React"),
+var React = require("react"),
     Vuo = require("vuo-react"),
-    Form = require("vuo-react/components/form"),
     AuthStore = require('./AuthStore'),
     AuthActions = require('./AuthActions');
 
 module.exports = React.createClass({
-    mixins: [Vuo.mixin],
+    mixins: [Vuo.mixins.BindStores],
     
     bindStores: function () {
-        Vuo.bindStates(AuthStore, ["username", "loggedIn"]);
+        Vuo.bindStore(AuthStore, ["username", "loggedIn"]);
     },
     
     render: function () {
@@ -81,11 +82,11 @@ module.exports = React.createClass({
           return <div>Logged in as {this.state.username}</div>;
         }
         return (this
-          <Form action={AuthActions.login}>
+          <Vuo.Form action={AuthActions.login}>
             <label>Username</label><input name="username" type="text"/>
             <label>Password</label><input name="password" type="password"/>
             <input type="submit" value="Log in"/>
-          </Form>
+          </Vuo.Form>
         );
     }
 });
