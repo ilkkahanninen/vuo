@@ -7,23 +7,19 @@
 ```javascript
 // AuthActions.js
 
-var ActionCreator = require("vuo").ActionCreator;
+var ActionCreator = require("vuo").ActionCreator,
+    AuthActions   = new ActionCreator("Auth", module.exports);
 
-module.exports = ActionCreator.create("Auth")
+AuthActions
 
-  .action("login", function (username, password) {
+  .action("login", function (form) {
       this.request({
           post: '/login',
-          data: {
-              username: username,
-              password: password
-          }
+          data: form
       });
   })
   
-  .action("logout")
-  
-  .publicAPI();
+  .action("logout");
 ```
 
 ### Store
@@ -83,7 +79,7 @@ module.exports = React.createClass({
           return <div>Logged in as {this.state.username}</div>;
         }
         return (this
-          <Form onSubmit={AuthActions.login}>
+          <Form action={AuthActions.login}>
             <label>Username</label><input name="username" type="text"/>
             <label>Password</label><input name="password" type="password"/>
             <input type="submit" value="Log in"/>
@@ -92,5 +88,3 @@ module.exports = React.createClass({
     }
 });
 ```
-
-Work on vuo-react hasn't been started yet.
