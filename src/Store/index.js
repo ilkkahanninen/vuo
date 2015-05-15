@@ -17,7 +17,7 @@ function Store(name, funcObj) {
   var self = this;
   
   this.name = name;
-  this.functions = funcObj || {};
+  this.exports = funcObj || {};
   this.states = {};
   this.listeners = [];
   this.emitter = new EventEmitter();
@@ -31,9 +31,9 @@ function Store(name, funcObj) {
     });
   });
   
-  // Generic functions to be used by the view layer
+  // Generic exports to be used by the view layer
   
-  this.functions.getState = function () {
+  this.exports.getState = function () {
     var key, state = {}, states = self.states;
     for (key in states) {
       if (states.hasOwnProperty(key)) {
@@ -43,8 +43,8 @@ function Store(name, funcObj) {
     return state;
   };
   
-  this.functions.on = this.emitter.on;
-  this.functions.removeListener = this.emitter.removeListener;
+  this.exports.on = this.emitter.on;
+  this.exports.removeListener = this.emitter.removeListener;
 }
 
 /*
@@ -55,7 +55,7 @@ Store.prototype = {
   addState: function (name, type, defaultValue, initializers) {
     var state = new State(name, this.name, type, defaultValue, initializers);
     this.states[name] = state;
-    this.functions[name] = state.get.bind(state);
+    this.exports[name] = state.get.bind(state);
     return this;
   },
 
@@ -81,7 +81,7 @@ Store.prototype = {
 
   declare: function (funcName, func) {
     var self = this;
-    this.functions[funcName] = function () {
+    this.exports[funcName] = function () {
       return clone(func.apply(self, Array.prototype.slice.call(arguments)));
     };
     return this;
@@ -106,13 +106,13 @@ Store.prototype = {
   },
   
   emit: function (event, data) {
-    return this.emitter.emit.call(this.functions, event, data);
+    return this.emitter.emit.call(this.exports, event, data);
   }
   
 };
 
 /*
-** STATIC FUNCTIONS
+** STATIC exports
 */
 
 Store.create = function (name, classDef) {

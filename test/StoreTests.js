@@ -28,7 +28,7 @@ describe("Store", function () {
       // Create a simple store for name
       var store = new Store("Test")
         .addState("myValue", "string", "LOL")
-        .functions;
+        .exports;
       assert.equal(store.myValue(), "LOL");
     });
     
@@ -37,7 +37,7 @@ describe("Store", function () {
       // Create a simple store for name
       var store = new Store("Test")
         .addState("secret", "string", "LOL", State.protect())
-        .functions;
+        .exports;
       
       // Check state
       assert.throws(function () { store.secret(); });
@@ -52,7 +52,7 @@ describe("Store", function () {
         .declare("sum", function () {
           return this.state.a + this.state.b;
         })
-        .functions;
+        .exports;
       
       assert.equal(store.a(), 2);
       assert.equal(store.b(), 3);
@@ -64,7 +64,7 @@ describe("Store", function () {
       // Create a simple store for name
       store = new Store("Test")
         .addState("object", "object", {value: 0})
-        .functions;
+        .exports;
       
       // Check state
       obj1 = store.object();
@@ -77,7 +77,7 @@ describe("Store", function () {
       var store = new Store("test")
         .addState("a", "number", 2)
         .addState("b", "number", 3)
-        .functions;
+        .exports;
       
       assert(store.a(), 2);
       assert(store.b(), 3);
@@ -87,12 +87,12 @@ describe("Store", function () {
     it('saves to local storage', function () {
       var store1 = new Store("Test")
         .addState("a", "number", 2, State.storeLocally())
-        .functions,
+        .exports,
 
       // Because store2 has same store and state name it should get the value (2) from local storage, saved by store1
         store2 = new Store("Test")
         .addState("a", "number", 999999999, State.storeLocally())
-        .functions;
+        .exports;
       
       assert(store1.a(), store2.a());
     });
@@ -110,7 +110,7 @@ describe("Store", function () {
         .on('setName', function (payload) {
           this.setState({name: payload.value});
         })
-        .functions;
+        .exports;
 
       // Listen to changes
       function onChange(x) {
@@ -137,7 +137,7 @@ describe("Store", function () {
         .on('setName2', function (payload) {
           this.setState({name: payload.value});
         })
-        .functions;
+        .exports;
 
       // Listen to changes
       function onChange(newStates) {

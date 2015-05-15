@@ -13,7 +13,7 @@ var
 */
 function ActionCreator(groupName, funcObj) {
   this.group = groupName;
-  this.functions = funcObj || {};
+  this.exports = funcObj || {};
 }
 
 /*
@@ -25,7 +25,7 @@ ActionCreator.create = function (groupName, funcObj) {
 
 ActionCreator.extend = function (name, func) {
   ActionCreator.prototype[name] = function () {
-    assign(this.functions, func.apply(this, arguments));
+    assign(this.exports, func.apply(this, arguments));
     return this;
   };
 };

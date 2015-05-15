@@ -29,14 +29,14 @@ describe("State", function () {
   });
 
   it('validates string correctly', function () {
-    var state = State.create('name', 'MyNamespace', 'string');
+    var state = State.create('name', 'MyNamespace', 'string', '');
     
     state.set('Wilco');
-    assert(state.get(), 'Wilco');
+    assert.equal(state.get(), 'Wilco');
   });
 
   it('validates invalid string correctly', function () {
-    var state = State.create('name', 'MyNamespace', 'string');
+    var state = State.create('name', 'MyNamespace', 'string', '');
     assert.throws(function () { state.set(303); });
   });
 
@@ -46,9 +46,9 @@ describe("State", function () {
     state.set({name: 'Wilco'});
     
     // Create state again
-    state = State.create('obj', 'MyNamespace', 'object', {}, State.storeLocally());
+    state = State.create('obj', 'MyNamespace', 'object', {name: 'lol'}, State.storeLocally());
 
-    assert(state.get().name, 'Wilco');
+    assert.equal(state.get().name, 'Wilco');
 
   });
 

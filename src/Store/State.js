@@ -33,7 +33,9 @@ function State(name, namespace, type, initialValue, initializers) {
     });
   }
   
-  this.set(initialValue);
+  if (this.value === undefined) {
+    this.set(initialValue);
+  }
 }
 
 /*

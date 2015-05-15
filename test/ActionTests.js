@@ -28,8 +28,8 @@ describe('ActionCreator', function () {
     var Actions = new ActionCreator('Test');
     Actions.action("foo");
     Actions.resource("bar", "/whatever/:id");
-    assert.equal(Actions.functions.FOO, 'Test.foo');
-    assert.equal(Actions.functions.BAR_GET, 'Test.bar.get');
+    assert.equal(Actions.exports.FOO, 'Test.foo');
+    assert.equal(Actions.exports.BAR_GET, 'Test.bar.get');
   });
 });
 
@@ -45,7 +45,7 @@ describe('Actions', function () {
     // Create simple action creator
     var NameAction = ActionCreator.create('Test')
       .action('setName')
-      .functions;
+      .exports;
 
     // Test things
     assert(NameAction.SET_NAME, 'Test.setName');
@@ -67,7 +67,7 @@ describe('Actions', function () {
       .action('setName', function (value) {
         this.dispatch(value.toUpperCase());
       })
-      .functions;
+      .exports;
 
     // Test things
     assert(NameAction.SET_NAME, 'Test2.setName');
@@ -93,7 +93,7 @@ describe('Actions', function () {
           lowercase: value.toLowerCase()
         });
       })
-      .functions;
+      .exports;
 
     // Test things
     assert(NameAction.SET_NAME, 'Test3.setName');
@@ -119,7 +119,7 @@ describe('Actions', function () {
           args: {id: 1}
         });
       })
-      .functions;
+      .exports;
     
     listenerID = Dispatcher.register(function (payload) {
       if (payload.type === ServerAction.GET_TEXT) {
@@ -141,7 +141,7 @@ describe('Actions', function () {
       .action('getText', function () {
         this.request({get: 'sudhfdisbgsdufghdfughdpfguhdfpgudhf'});
       })
-      .functions;
+      .exports;
     
     listenerID = Dispatcher.register(function (payload) {
       if (payload.type === ServerAction.GET_TEXT_ERROR) {
@@ -157,7 +157,7 @@ describe('Actions', function () {
 
       var RestAction = ActionCreator.create('Rest')
         .resource('users', 'http://jsonplaceholder.typicode.com/users/:id')
-        .functions;
+        .exports;
 
       // Functions exist
       assert(typeof RestAction.users.get, 'function');
