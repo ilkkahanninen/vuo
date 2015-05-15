@@ -81,7 +81,7 @@ module.exports = React.createClass({
         if (this.state.loggedIn) {
           return <div>Logged in as {this.state.username}</div>;
         }
-        return (this
+        return (
           <Vuo.Form action={AuthActions.login}>
             <label>Username</label><input name="username" type="text"/>
             <label>Password</label><input name="password" type="password"/>
