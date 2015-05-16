@@ -53,3 +53,32 @@ describe("State", function () {
   });
 
 });
+
+describe("State validation", function () {
+  it("min", function () {
+    var state = State.create("age", null, "number", 18, State.min(5));
+    state.set(1);
+    assert.equal(state.get(), 5);
+    state.set(100);
+    assert.equal(state.get(), 100);
+  });
+  
+  it("max", function () {
+    var state = State.create("age", null, "number", 18, State.max(50));
+    state.set(1);
+    assert.equal(state.get(), 1);
+    state.set(100);
+    assert.equal(state.get(), 50);
+  });
+
+  it("bound", function () {
+    var state = State.create("age", null, "number", 18, State.bound(5, 50));
+    state.set(1);
+    assert.equal(state.get(), 5);
+    state.set(25);
+    assert.equal(state.get(), 25);
+    state.set(100);
+    assert.equal(state.get(), 50);
+  });
+  
+});

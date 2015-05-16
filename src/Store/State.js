@@ -4,9 +4,10 @@
 "use strict";
 
 var
-  TypeValidator = require('./TypeValidator'),
-  LocalStorage  = require('./LocalStorage'),
-  clone = require('clone');
+  TypeValidator   = require('./TypeValidator'),
+  RangeValidators = require('./RangeValidators'),
+  LocalStorage    = require('./LocalStorage'),
+  clone           = require('clone');
 
 /*
 ** CONSTRUCTOR
@@ -87,6 +88,24 @@ State.storeLocally = function () {
     var storage = new LocalStorage(this.namespace, this.name);
     this.setHandlers.push(storage);
     this.value = storage.get(this.value);
+  };
+};
+
+State.min = function (minValue, strict) {
+  return function () {
+    this.setHandlers.push(new RangeValidators.min(minValue, strict));
+  };
+};
+
+State.max = function (maxValue, strict) {
+  return function () {
+    this.setHandlers.push(new RangeValidators.max(maxValue, strict));
+  };
+};
+
+State.bound = function (minValue, maxValue, strict) {
+  return function () {
+    this.setHandlers.push(new RangeValidators.bound(minValue, maxValue, strict));
   };
 };
 
