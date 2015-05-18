@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "build": "node node_modules/webpack/bin/webpack.js src vuo.js",
-    "watch": "node node_modules/webpack/bin/webpack.js src vuo.js --watch"
+    "docs": "node node_modules/jsdoc/jsdoc.js src -r -c jsdoc.conf -d docs"
   },
   "author": "Ilkka Hänninen / Livion",
   "license": "MIT",
@@ -18,6 +17,8 @@
     "xtypejs": "^0.2.8"
   },
   "devDependencies": {
+    "ink-docstrap": "^0.5.2",
+    "jsdoc": "^3.3.0",
     "superagent-mock": "^1.1.0"
   }
 }
