@@ -39,18 +39,18 @@ Store.create("Auth", module.exports)
     .addState("userData",   "object",         {})
     
     // Listeners
-    .on(AuthActions.LOGIN, function (payload) {
+    .on(AuthActions.login, function (payload) {
         this.setState({
             token:  payload.token,
             user:   payload.user
         });
     })
     
-    .on(AuthActions.LOGOUT, function (payload) {
+    .on(AuthActions.logout, function (payload) {
         this.setState({token: null, user: null});
     })
     
-    .on(AuthActions.USER_DATA_QUERY, "userData")
+    .on(AuthActions.userData.query, "userData")
     
     // Custom getters
     .declare('loggedIn', function () {

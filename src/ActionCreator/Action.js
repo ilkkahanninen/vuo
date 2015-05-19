@@ -59,15 +59,12 @@ module.exports = function (name, func) {
   var
     self = this,
     publish = {},
-    actionID = this.getID(name),
-    constName = this.getConst(name);
-
-  publish[constName] = actionID;
+    actionID = this.getID(name);
 
   if (func) {
 
-    publish[this.getConst(name, 'error')] = this.getID(name, 'error');
     publish[name] = func.bind(func);
+    publish[name].error = this.getID(name, 'error');
 
     /*
      * Action creator inner API
@@ -100,6 +97,11 @@ module.exports = function (name, func) {
       Dispatcher.dispatch({type: actionID, value: value});
     };
   }
+  
+  // Assign id
+  publish[name].toString = function () {
+    return actionID;
+  };
 
   return publish;
 };

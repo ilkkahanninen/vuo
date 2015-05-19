@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "docs": "node node_modules/jsdoc/jsdoc.js src -r -c jsdoc.conf -d docs"
+    "docs": "node node_modules/jsdoc/jsdoc.js src -r -c jsdoc.conf -t node_modules/ink-docstrap/template -d docs"
   },
   "author": "Ilkka Hänninen / Livion",
   "license": "MIT",
@@ -19,6 +19,7 @@
   "devDependencies": {
     "ink-docstrap": "^0.5.2",
     "jsdoc": "^3.3.0",
+    "jsdoc-oblivion": "0.0.4",
     "superagent-mock": "^1.1.0"
   }
 }

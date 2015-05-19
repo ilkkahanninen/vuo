@@ -19,8 +19,6 @@ describe('ActionCreator', function () {
     var Actions = new ActionCreator('Test');
     assert.equal(Actions.getID('setName'), 'Test.setName');
     assert.equal(Actions.getID('names', 'set'), 'Test.names.set');
-    assert.equal(Actions.getConst('setName'), 'SET_NAME');
-    assert.equal(Actions.getConst('names', 'set'), 'NAMES_SET');
     assert.equal(Actions.createRequestID('getNames'), '1# Test.getNames');
   });
 
@@ -28,8 +26,8 @@ describe('ActionCreator', function () {
     var Actions = new ActionCreator('Test');
     Actions.action("foo");
     Actions.resource("bar", "/whatever/:id");
-    assert.equal(Actions.exports.FOO, 'Test.foo');
-    assert.equal(Actions.exports.BAR_GET, 'Test.bar.get');
+    assert.equal(Actions.exports.foo, 'Test.foo');
+    assert.equal(Actions.exports.bar.get, 'Test.bar.get');
   });
 });
 
@@ -48,10 +46,10 @@ describe('Actions', function () {
       .exports;
 
     // Test things
-    assert(NameAction.SET_NAME, 'Test.setName');
+    assert(NameAction.setName, 'Test.setName');
     
     listenerID = Dispatcher.register(function (payload) {
-      if (payload.type === NameAction.SET_NAME) {
+      if (payload.type === NameAction.setName.toString()) {
         assert(payload.value, 'Mickey');
         done();
       }
@@ -70,10 +68,10 @@ describe('Actions', function () {
       .exports;
 
     // Test things
-    assert(NameAction.SET_NAME, 'Test2.setName');
+    assert(NameAction.setName, 'Test2.setName');
     
     Dispatcher.register(function (payload) {
-      if (payload.type === NameAction.SET_NAME) {
+      if (payload.type === NameAction.setName.toString()) {
         assert(payload.value, 'MICKEY');
         done();
       }
@@ -96,10 +94,10 @@ describe('Actions', function () {
       .exports;
 
     // Test things
-    assert(NameAction.SET_NAME, 'Test3.setName');
+    assert(NameAction.setName, 'Test3.setName');
     
     listenerID = Dispatcher.register(function (payload) {
-      if (payload.type === NameAction.SET_NAME) {
+      if (payload.type === NameAction.setName.toString()) {
         assert(payload.value, 'Mickey');
         assert(payload.lowercase, 'mickey');
         done();
@@ -122,11 +120,11 @@ describe('Actions', function () {
       .exports;
     
     listenerID = Dispatcher.register(function (payload) {
-      if (payload.type === ServerAction.GET_TEXT) {
+      if (payload.type === ServerAction.getText.toString()) {
         assert(payload.id, 1);
         done();
       }
-      if (payload.type === Vuo.Actions.REQUEST_ERROR) {
+      if (payload.type === Vuo.Actions.requestError.toString()) {
         throw new Error("Request failed: " + payload.error.message);
       }
     });
@@ -144,7 +142,7 @@ describe('Actions', function () {
       .exports;
     
     listenerID = Dispatcher.register(function (payload) {
-      if (payload.type === ServerAction.GET_TEXT_ERROR) {
+      if (payload.type === ServerAction.getText.error.toString()) {
         done();
       }
     });
@@ -167,10 +165,10 @@ describe('Actions', function () {
       
       // Test get
       listenerID = Dispatcher.register(function (payload) {
-        if (payload.type === RestAction.USERS_GET) {
+        if (payload.type === RestAction.users.get.toString()) {
           done();
         }
-        if (payload.type === Vuo.Actions.REQUEST_ERROR) {
+        if (payload.type === Vuo.Actions.requestError.toString()) {
           throw new Error("Request failed: " + payload.error.message);
         }
       });

@@ -42,12 +42,8 @@ module.exports = function (resourceName, url, options) {
   function createRequestFunc(name, method, sendID) {
     var
       actionID    = self.getID(resourceName, name),
-      errorID     = self.getID(resourceName, name, 'error'),
-      actionConst = self.getConst(resourceName, name),
-      errorConst  = self.getConst(resourceName, name, 'error');
+      errorID     = self.getID(resourceName, name, 'error');
 
-    publish[actionConst] = actionID;
-    publish[errorConst] = errorID;
     iface[name] = function (id, value, def) {
       var
         reqURL = url.replace(/\/:(\w)+/, sendID ? '/' + id : ''),
@@ -66,6 +62,12 @@ module.exports = function (resourceName, url, options) {
       }
       serverRequest(request);
     };
+    
+    // Assign ids
+    iface[name].toString = function () {
+      return actionID;
+    };
+    iface[name].error = errorID;
   }
 
   //                 Name      HTTP method  Send ID
