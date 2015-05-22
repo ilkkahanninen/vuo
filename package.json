@@ -4,10 +4,10 @@
   "description": "Flux framework",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
-    "docs": "node node_modules/jsdoc/jsdoc.js src -r -c jsdoc.conf -t node_modules/ink-docstrap/template -d docs"
+    "test": "mocha"
   },
   "author": "Ilkka Hänninen / Livion",
+  "repository": "http://www.github.com/ilkkahanninen/vuo",
   "license": "MIT",
   "dependencies": {
     "clone": "^1.0.2",
@@ -17,9 +17,6 @@
     "xtypejs": "^0.2.8"
   },
   "devDependencies": {
-    "ink-docstrap": "^0.5.2",
-    "jsdoc": "^3.3.0",
-    "jsdoc-oblivion": "0.0.4",
     "superagent-mock": "^1.1.0"
   }
 }
