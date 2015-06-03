@@ -85,11 +85,10 @@ module.exports = function (args) {
 
 module.exports.SuperAgent = SuperAgent;
 
-module.exports.reset = function () {
+module.exports.resetHeaders = function () {
   headers = {};
 };
 
-module.exports.set = function (newHeaders) {
+module.exports.setHeaders = function (newHeaders) {
   assign(headers, newHeaders);
 };
-
